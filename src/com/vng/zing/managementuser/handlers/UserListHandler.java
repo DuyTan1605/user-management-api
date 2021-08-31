@@ -5,15 +5,19 @@
 package com.vng.zing.managementuser.handlers;
 
 import com.vng.zing.logger.ZLogger;
+import com.vng.zing.managementuser.entity.ApiResponse;
 import com.vng.zing.stats.Profiler;
 import com.vng.zing.stats.ThreadProfiler;
-import com.vng.zing.managementuser.models.UserListModel;
+import com.vng.zing.managementuser.services.UserListService;
+import com.vng.zing.userservice.thrift.ListUserResult;
 import java.io.IOException;
+import java.io.PrintWriter;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.apache.log4j.Logger;
+import org.json.JSONObject;
 
 public class UserListHandler extends HttpServlet {
 
@@ -25,13 +29,19 @@ public class UserListHandler extends HttpServlet {
     }
 
     private void doProcess(HttpServletRequest req, HttpServletResponse resp) {
-        ThreadProfiler profiler = Profiler.createThreadProfilerInHttpProc("UserListHandler", req);
+        resp.setContentType("application/json");
+        resp.setCharacterEncoding("UTF-8");
+        PrintWriter out = null;
         try {
-            UserListModel.Instance.getList(req, resp);
+            out = resp.getWriter();
+            JSONObject result = UserListService.Instance.getList();
+            out.print(result);
         } catch (Exception ex) {
             _Logger.error(null, ex);
         } finally {
-            Profiler.closeThreadProfiler();
+            if (out != null) {
+                out.close();
+            }
         }
     }
 }
