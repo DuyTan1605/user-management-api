@@ -11,6 +11,7 @@ import com.vng.zing.userservice.thrift.ListUserParams;
 import com.vng.zing.userservice.thrift.ListUserResult;
 import com.vng.zing.userservice.thrift.User;
 import com.vng.zing.userservice.thrift.wrapper.UserMwClient;
+import com.vng.zing.utils.DateTimeUtils;
 import java.io.PrintWriter;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -46,9 +47,9 @@ public class UserListModel {
                 temp.put("name", user.name);
                 temp.put("username", user.username);
                 temp.put("password", user.password);
-                temp.put("birthday", user.birthday);
-                temp.put("createtime", user.createtime);
-                temp.put("updatetime", user.updatetime);
+                temp.put("birthday", DateTimeUtils.getLocalDateTime(user.birthday));
+                temp.put("createtime", DateTimeUtils.getLocalDateTime(user.createtime));
+                temp.put("updatetime", DateTimeUtils.getLocalDateTime(user.updatetime));
                 arrayData.add(temp);
             }
             obj.put("code", result.getCode());

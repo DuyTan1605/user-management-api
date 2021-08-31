@@ -22,7 +22,13 @@ import com.vng.zing.userservice.thrift.UpdateUserParams;
 import com.vng.zing.userservice.thrift.UpdateUserResult;
 import com.vng.zing.userservice.thrift.User;
 import com.vng.zing.userservice.thrift.wrapper.UserMwClient;
+import com.vng.zing.utils.DateTimeUtils;
 import java.io.PrintWriter;
+import java.math.BigInteger;
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
@@ -62,7 +68,7 @@ public class UserModel {
             JSONObject obj = new JSONObject();
             if (req.getParameter("id") == null) {
                 obj.put("code", ZErrorDef.BAD_REQUEST);
-                obj.put("data", new JSONObject().put("user", new JSONObject()));
+                obj.put("data", new JSONObject().put("message", "Missing user ID"));
                 out.println(obj);
             } else {
                 UserMwClient client = new UserMwClient("Main");
@@ -76,9 +82,9 @@ public class UserModel {
                     temp.put("name", user.name);
                     temp.put("username", user.username);
                     temp.put("password", user.password);
-                    temp.put("birthday", user.birthday);
-                    temp.put("createtime", user.createtime);
-                    temp.put("updatetime", user.updatetime);
+                    temp.put("birthday", DateTimeUtils.getLocalDateTime(user.birthday));
+                    temp.put("createtime", DateTimeUtils.getLocalDateTime(user.createtime));
+                    temp.put("updatetime", DateTimeUtils.getLocalDateTime(user.updatetime));
                 }
                 obj.put("data", new JSONObject().put("user", temp));
                 out.println(obj);
@@ -103,9 +109,9 @@ public class UserModel {
         try {
             out = resp.getWriter();
             JSONObject obj = new JSONObject();
-            if (req.getParameter("id") == null) {
+            if (req.getParameter("name") == null || req.getParameter("username") == null || req.getParameter("gender") == null || req.getParameter("birthday") == null) {
                 obj.put("code", ZErrorDef.BAD_REQUEST);
-                obj.put("data", new JSONObject().put("user", new JSONObject()));
+                obj.put("data", new JSONObject().put("message", "Missing user infomation"));
                 out.println(obj);
             } else {
                 UserMwClient client = new UserMwClient("Main");
@@ -134,37 +140,41 @@ public class UserModel {
         }
     }
 
-    public void createUser(HttpServletRequest req, HttpServletResponse resp) {
+    public void createUser(HttpServletRequest req, HttpServletResponse resp) throws JSONException {
         ThreadProfiler profiler = Profiler.getThreadProfiler();
         resp.setContentType("application/json");
         resp.setCharacterEncoding("UTF-8");
         PrintWriter out = null;
-
-        try {
-            out = resp.getWriter();
-            JSONObject obj = new JSONObject();
-
-            UserMwClient client = new UserMwClient("Main");
-            CreateUserParams params = new CreateUserParams();
-            User createdUser = new User();
-            createdUser.setPassword(req.getParameter("password"));
-            createdUser.setUsername(req.getParameter("username"));
-            createdUser.setName(req.getParameter("name"));
-            createdUser.setBirthday(formatDateTime(req.getParameter("birthday")));
-            createdUser.setGender(Gender.findByValue(Integer.parseInt(req.getParameter("gender"))));
-            params.setUser(createdUser);
-            CreateUserResult result = client.createUser(params);
-            profiler.push(this.getClass(), "output");
-            obj.put("code", result.getCode());
-            obj.put("data", new JSONObject().put("message", result.getMessage()));
+        JSONObject obj = new JSONObject();
+        if (req.getParameter("name") == null || req.getParameter("username") == null || req.getParameter("password") == null || req.getParameter("gender") == null || req.getParameter("birthday") == null) {
+            obj.put("code", ZErrorDef.BAD_REQUEST);
+            obj.put("data", new JSONObject().put("message", "Missing new user infomation"));
             out.println(obj);
-            profiler.pop(this.getClass(), "output");
+        } else {
+            try {
+                out = resp.getWriter();
+                UserMwClient client = new UserMwClient("Main");
+                CreateUserParams params = new CreateUserParams();
+                User createdUser = new User();
+                createdUser.setPassword(req.getParameter("password"));
+                createdUser.setUsername(req.getParameter("username"));
+                createdUser.setName(req.getParameter("name"));
+                createdUser.setBirthday(formatDateTime(req.getParameter("birthday")));
+                createdUser.setGender(Gender.findByValue(Integer.parseInt(req.getParameter("gender"))));
+                params.setUser(createdUser);
+                CreateUserResult result = client.createUser(params);
+                profiler.push(this.getClass(), "output");
+                obj.put("code", result.getCode());
+                obj.put("data", new JSONObject().put("message", result.getMessage()));
+                out.println(obj);
+                profiler.pop(this.getClass(), "output");
 
-        } catch (Exception ex) {
-            _Logger.error(null, ex);
-        } finally {
-            if (out != null) {
-                out.close();
+            } catch (Exception ex) {
+                _Logger.error(null, ex);
+            } finally {
+                if (out != null) {
+                    out.close();
+                }
             }
         }
     }

@@ -47,7 +47,6 @@ public class UserHandler extends HttpServlet {
 
     private void doProcess(HttpServletRequest req, HttpServletResponse resp) {
         ThreadProfiler profiler = Profiler.createThreadProfilerInHttpProc("UserHandler", req);
-        System.out.println(req.getMethod());
         try {
             switch (req.getMethod()) {
                 case "GET": {
