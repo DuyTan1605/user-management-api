@@ -5,11 +5,7 @@
 package com.vng.zing.managementuser.handlers;
 
 import com.vng.zing.logger.ZLogger;
-import com.vng.zing.managementuser.entity.ApiResponse;
-import com.vng.zing.stats.Profiler;
-import com.vng.zing.stats.ThreadProfiler;
 import com.vng.zing.managementuser.services.UserListService;
-import com.vng.zing.userservice.thrift.ListUserResult;
 import java.io.IOException;
 import java.io.PrintWriter;
 import javax.servlet.ServletException;

@@ -9,10 +9,6 @@ import com.vng.zing.managementuser.handlers.UserHandler;
 import com.vng.zing.managementuser.handlers.UserListHandler;
 import org.eclipse.jetty.servlet.ServletHandler;
 
-/**
- *
- * @author namnq
- */
 public class HServers {
 
     public boolean setupAndStart() {

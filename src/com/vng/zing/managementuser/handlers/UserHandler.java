@@ -7,12 +7,12 @@ package com.vng.zing.managementuser.handlers;
 
 import com.vng.zing.logger.ZLogger;
 import com.vng.zing.managementuser.entity.ApiResponse;
-import com.vng.zing.managementuser.entity.UserDTO;
 import com.vng.zing.managementuser.services.UserListService;
 import com.vng.zing.managementuser.services.UserService;
 import com.vng.zing.stats.Profiler;
 import com.vng.zing.stats.ThreadProfiler;
 import com.vng.zing.userservice.thrift.Gender;
+import com.vng.zing.userservice.thrift.User;
 import com.vng.zing.utils.DateTimeUtils;
 import com.vng.zing.zcommon.thrift.ECode;
 import java.io.IOException;
@@ -60,13 +60,13 @@ public class UserHandler extends HttpServlet {
                 apiResponse.setData(invalidRequest);
                 out.println(apiResponse.getFinalResponse());
             } else {
-                UserDTO updateUserParams = new UserDTO();
-                updateUserParams.setId(Integer.parseInt(req.getParameter("id")));
-                updateUserParams.setName(req.getParameter("name"));
-                updateUserParams.setUserName(req.getParameter("username"));
-                updateUserParams.setBirthday(DateTimeUtils.formatDateTime(req.getParameter("birthday")));
-                updateUserParams.setGender(Gender.findByValue(Integer.parseInt(req.getParameter("gender"))));
-                JSONObject result = UserService.Instance.updateUser(updateUserParams);
+                User newUser = new User();
+                newUser.setId(Integer.parseInt(req.getParameter("id")));
+                newUser.setName(req.getParameter("name"));
+                newUser.setUsername(req.getParameter("username"));
+                newUser.setBirthday(DateTimeUtils.formatDateTime(req.getParameter("birthday")));
+                newUser.setGender(Gender.findByValue(Integer.parseInt(req.getParameter("gender"))));
+                JSONObject result = UserService.Instance.updateUser(newUser);
                 out.println(result);
             }
         } catch (Exception ex) {
@@ -93,8 +93,7 @@ public class UserHandler extends HttpServlet {
                 apiResponse.setData(invalidRequest);
                 out.println(apiResponse.getFinalResponse());
             } else {
-                UserDTO getUserParams = new UserDTO(Integer.parseInt(req.getParameter("id")));
-                JSONObject result = UserService.Instance.getUser(getUserParams);
+                JSONObject result = UserService.Instance.getUser(Integer.parseInt(req.getParameter("id")));
                 out.println(result);
             }
         } catch (Exception ex) {
@@ -128,13 +127,13 @@ public class UserHandler extends HttpServlet {
                 apiResponse.setData(invalidRequest);
                 out.println(apiResponse.getFinalResponse());
             } else {
-                UserDTO createUserParams = new UserDTO();
-                createUserParams.setName(req.getParameter("name"));
-                createUserParams.setUserName(req.getParameter("username"));
-                createUserParams.setPassword(req.getParameter("password"));
-                createUserParams.setBirthday(DateTimeUtils.formatDateTime(req.getParameter("birthday")));
-                createUserParams.setGender(Gender.findByValue(Integer.parseInt(req.getParameter("gender"))));
-                JSONObject result = UserService.Instance.createUser(createUserParams);
+                User newUser = new User();
+                newUser.setName(req.getParameter("name"));
+                newUser.setUsername(req.getParameter("username"));
+                newUser.setPassword(req.getParameter("password"));
+                newUser.setBirthday(DateTimeUtils.formatDateTime(req.getParameter("birthday")));
+                newUser.setGender(Gender.findByValue(Integer.parseInt(req.getParameter("gender"))));
+                JSONObject result = UserService.Instance.createUser(newUser);
                 out.println(result);
             }
         } catch (Exception ex) {
@@ -164,9 +163,7 @@ public class UserHandler extends HttpServlet {
                 apiResponse.setData(invalidRequest);
                 out.println(apiResponse.getFinalResponse());
             } else {
-                UserDTO deleteUserParams = new UserDTO();
-                deleteUserParams.setId(Integer.parseInt(req.getParameter("id")));
-                JSONObject result = UserService.Instance.deleteUser(deleteUserParams);
+                JSONObject result = UserService.Instance.deleteUser(Integer.parseInt(req.getParameter("id")));
                 out.println(result);
             }
         } catch (Exception ex) {

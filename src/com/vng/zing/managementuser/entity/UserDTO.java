@@ -6,6 +6,8 @@
 package com.vng.zing.managementuser.entity;
 
 import com.vng.zing.userservice.thrift.Gender;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 /**
  *
@@ -17,80 +19,28 @@ public class UserDTO {
     private String name;
     private String userName;
     private Gender gender;
-    private long birthday;
-    private long createTime;
-    private long updateTime;
-    private String password;
+    private String birthday;
+    private String createTime;
+    private String updateTime;
 
-    public UserDTO() {
-    }
-
-    public void setId(int id) {
+    public UserDTO(int id, String name, String userName, Gender gender, String birthday, String createTime, String updateTime) {
         this.id = id;
-    }
-
-    public void setName(String name) {
         this.name = name;
-    }
-
-    public void setUserName(String userName) {
         this.userName = userName;
-    }
-
-    public void setGender(Gender gender) {
         this.gender = gender;
-    }
-
-    public void setBirthday(long birthday) {
         this.birthday = birthday;
-    }
-
-    public void setCreateTime(long createTime) {
         this.createTime = createTime;
-    }
-
-    public void setUpdateTime(long updateTime) {
         this.updateTime = updateTime;
     }
 
-    public void setPassword(String password) {
-        this.password = password;
+    public JSONObject getUserResponse() throws JSONException {
+        JSONObject result = new JSONObject();
+        result.put("id", this.id);
+        result.put("name", this.name);
+        result.put("username", this.userName);
+        result.put("birthday", this.birthday);
+        result.put("createtime", this.createTime);
+        result.put("updatetime", this.updateTime);
+        return result;
     }
-
-    public UserDTO(int id) {
-        this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public String getUserName() {
-        return userName;
-    }
-
-    public Gender getGender() {
-        return gender;
-    }
-
-    public long getBirthday() {
-        return birthday;
-    }
-
-    public long getCreateTime() {
-        return createTime;
-    }
-
-    public long getUpdateTime() {
-        return updateTime;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public int getId() {
-        return id;
-    }
-
 }
