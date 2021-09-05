@@ -13,8 +13,7 @@ import com.vng.zing.userservice.thrift.ListUserParams;
 import com.vng.zing.userservice.thrift.ListUserResult;
 import com.vng.zing.userservice.thrift.User;
 import com.vng.zing.userservice.thrift.wrapper.UserMwClient;
-import com.vng.zing.utils.DateTimeUtils;
-import com.vng.zing.zcommon.thrift.ECode;
+import com.vng.zing.managementuser.utils.DateTimeUtils;
 import org.apache.log4j.Logger;
 import org.apache.thrift.TException;
 import org.json.JSONException;
@@ -24,32 +23,24 @@ import org.json.simple.JSONArray;
 public class UserListService {
 
     private static final Logger _Logger = ZLogger.getLogger(UserListService.class);
-    public static final UserListService Instance = new UserListService();
     public static final UserMwClient client = new UserMwClient("Main");
+    private ApiResponse apiResponse = new ApiResponse();
 
-    private UserListService() {
+    public UserListService() {
     }
 
-    public JSONObject getList() throws TException, JSONException {
+    public Object getList() throws TException, JSONException {
         ThreadProfiler profiler = Profiler.getThreadProfiler();
         JSONArray arrayData = new JSONArray();
-        ApiResponse apiResponse = new ApiResponse();
-        try {
-            ListUserResult result = client.getUsers(new ListUserParams());
-            profiler.push(this.getClass(), "output");
-            for (User user : result.getData()) {
-                UserDTO myUser = new UserDTO(user.id, user.name, user.username, user.gender, DateTimeUtils.getLocalDateTime(user.birthday), DateTimeUtils.getLocalDateTime(user.createtime), DateTimeUtils.getLocalDateTime(user.updatetime));
-                arrayData.add(myUser.getUserResponse());
-            }
-            apiResponse.setCode(result.getCode());
-            apiResponse.setData(new JSONObject().put("users", arrayData));
-            profiler.pop(this.getClass(), "output");
-        } catch (Exception ex) {
-            _Logger.error(null, ex);
-            apiResponse.setCode(ECode.C_FAIL.getValue());
-            apiResponse.setData(new JSONObject());
+        ListUserResult result = client.getUsers(new ListUserParams());
+        profiler.push(this.getClass(), "output");
+        for (User user : result.getData()) {
+            UserDTO myUser = new UserDTO(user.id, user.name, user.username, user.gender, DateTimeUtils.getLocalDateTime(user.birthday), DateTimeUtils.getLocalDateTime(user.createtime), DateTimeUtils.getLocalDateTime(user.updatetime));
+            arrayData.add(myUser.getUserResponse());
         }
-
-        return apiResponse.getFinalResponse();
+        apiResponse.setCode(result.getCode());
+        apiResponse.setData(new JSONObject().put("users", arrayData));
+        profiler.pop(this.getClass(), "output");
+        return apiResponse;
     }
 }

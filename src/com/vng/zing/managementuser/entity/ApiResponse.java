@@ -16,13 +16,13 @@ public class ApiResponse {
 
     private int code;
 
-    private JSONObject data;
+    private Object data;
 
     public ApiResponse() {
 
     }
 
-    public ApiResponse(int code, JSONObject data) {
+    public ApiResponse(int code, Object data) {
         this.code = code;
         this.data = data;
     }
@@ -34,11 +34,15 @@ public class ApiResponse {
         return result;
     }
 
+    public JSONObject createMessageError(String message) throws JSONException {
+        return new JSONObject().put("message", message);
+    }
+
     public void setCode(int code) {
         this.code = code;
     }
 
-    public void setData(JSONObject data) {
+    public void setData(Object data) {
         this.data = data;
     }
 

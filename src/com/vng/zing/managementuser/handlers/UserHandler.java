@@ -5,29 +5,22 @@
  */
 package com.vng.zing.managementuser.handlers;
 
+import com.vng.zing.common.HReqParam;
+import com.vng.zing.dmp.common.exception.ZInvalidParamException;
+import com.vng.zing.exception.NotExistException;
 import com.vng.zing.logger.ZLogger;
 import com.vng.zing.managementuser.entity.ApiResponse;
-import com.vng.zing.managementuser.services.UserListService;
 import com.vng.zing.managementuser.services.UserService;
-import com.vng.zing.stats.Profiler;
-import com.vng.zing.stats.ThreadProfiler;
-import com.vng.zing.userservice.thrift.Gender;
-import com.vng.zing.userservice.thrift.User;
-import com.vng.zing.utils.DateTimeUtils;
+import com.vng.zing.managementuser.utils.RequestUtils;
 import com.vng.zing.zcommon.thrift.ECode;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.logging.Level;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import org.apache.commons.lang.time.DateUtils;
 import org.apache.log4j.Logger;
 import org.json.JSONException;
-import org.json.JSONObject;
 
 /**
  *
@@ -36,141 +29,192 @@ import org.json.JSONObject;
 public class UserHandler extends HttpServlet {
 
     private static final Logger _Logger = ZLogger.getLogger(UserHandler.class);
+    private final UserService userService = new UserService();
 
     @Override
     protected void doPut(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        ApiResponse apiResponse = new ApiResponse();
         PrintWriter out = null;
+        resp.setContentType("application/json");
+        resp.setCharacterEncoding("UTF-8");
+        ApiResponse apiResponse = new ApiResponse();
         try {
-            resp.setContentType("application/json");
-            resp.setCharacterEncoding("UTF-8");
             out = resp.getWriter();
-            List<String> parameterNames = new ArrayList<String>(req.getParameterMap().keySet());
-            List<String> requiredParams = new ArrayList<String>();
-            requiredParams.add("id");
-            requiredParams.add("name");
-            requiredParams.add("username");
-            requiredParams.add("password");
-            requiredParams.add("gender");
-            requiredParams.add("birthday");
-            if (!parameterNames.containsAll(requiredParams)) {
-                JSONObject invalidRequest = new JSONObject();
-                invalidRequest.put("message", "Missing user infomation");
-                apiResponse.setCode(ECode.INVALID_PARAM.getValue());
-                apiResponse.setData(invalidRequest);
-                out.println(apiResponse.getFinalResponse());
-            } else {
-                User newUser = new User();
-                newUser.setId(Integer.parseInt(req.getParameter("id")));
-                newUser.setName(req.getParameter("name"));
-                newUser.setUsername(req.getParameter("username"));
-                newUser.setBirthday(DateTimeUtils.formatDateTime(req.getParameter("birthday")));
-                newUser.setGender(Gender.findByValue(Integer.parseInt(req.getParameter("gender"))));
-                JSONObject result = UserService.Instance.updateUser(newUser);
-                out.println(result);
+            Object putUserParams = RequestUtils.updateUserParams(req);
+            Object result = userService.updateUser(putUserParams);
+            apiResponse = (ApiResponse) result;
+        } catch (NotExistException ex) {
+            _Logger.error(null, ex);
+            apiResponse.setCode(ECode.INVALID_PARAM.getValue());
+            try {
+                apiResponse.setData(apiResponse.createMessageError("Missing credentials"));
+            } catch (JSONException ex1) {
+                _Logger.error(null, ex1);
+            }
+        } catch (ZInvalidParamException ex) {
+            _Logger.error(null, ex);
+            apiResponse.setCode(ex.getError());
+            try {
+                apiResponse.setData(apiResponse.createMessageError(ex.getMessage()));
+            } catch (JSONException ex1) {
+                _Logger.error(null, ex1);
             }
         } catch (Exception ex) {
             _Logger.error(null, ex);
+            apiResponse.setCode(ECode.C_FAIL.getValue());
+            try {
+                apiResponse.setData(apiResponse.createMessageError(ex.getMessage()));
+            } catch (JSONException ex1) {
+                _Logger.error(null, ex1);
+            }
         } finally {
-            if (out != null) {
-                out.close();
+            try {
+                out.println(apiResponse.getFinalResponse());
+                if (out != null) {
+                    out.close();
+                }
+            } catch (JSONException ex) {
+                _Logger.error(null, ex);
             }
         }
     }
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) {
-        ApiResponse apiResponse = new ApiResponse();
+        resp.setContentType("application/json");
+        resp.setCharacterEncoding("UTF-8");
         PrintWriter out = null;
+        ApiResponse apiResponse = new ApiResponse();
         try {
-            resp.setContentType("application/json");
-            resp.setCharacterEncoding("UTF-8");
             out = resp.getWriter();
-            if (req.getParameter("id") == null) {
-                JSONObject invalidRequest = new JSONObject();
-                invalidRequest.put("message", "Missing user ID");
-                apiResponse.setCode(ECode.INVALID_PARAM.getValue());
-                apiResponse.setData(invalidRequest);
-                out.println(apiResponse.getFinalResponse());
-            } else {
-                JSONObject result = UserService.Instance.getUser(Integer.parseInt(req.getParameter("id")));
-                out.println(result);
+            int id = HReqParam.getInt(req, "id");
+            Object result = userService.getUser(id);
+            apiResponse = (ApiResponse) result;
+        } catch (NotExistException ex) {
+            _Logger.error(null, ex);
+            apiResponse.setCode(ECode.INVALID_PARAM.getValue());
+            try {
+                apiResponse.setData(apiResponse.createMessageError("Missing user ID"));
+            } catch (JSONException ex1) {
+                _Logger.error(null, ex1);
+            }
+        } catch (ZInvalidParamException ex) {
+            _Logger.error(null, ex);
+            apiResponse.setCode(ex.getError());
+            try {
+                apiResponse.setData(apiResponse.createMessageError(ex.getMessage()));
+            } catch (JSONException ex1) {
+                _Logger.error(null, ex1);
             }
         } catch (Exception ex) {
             _Logger.error(null, ex);
+            apiResponse.setCode(ECode.C_FAIL.getValue());
+            try {
+                apiResponse.setData(apiResponse.createMessageError(ex.getMessage()));
+            } catch (JSONException ex1) {
+                _Logger.error(null, ex1);
+            }
         } finally {
-            if (out != null) {
-                out.close();
+            try {
+                out.println(apiResponse.getFinalResponse());
+                if (out != null) {
+                    out.close();
+                }
+            } catch (JSONException ex) {
+                _Logger.error(null, ex);
             }
         }
     }
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        ApiResponse apiResponse = new ApiResponse();
         PrintWriter out = null;
+        resp.setContentType("application/json");
+        resp.setCharacterEncoding("UTF-8");
+        ApiResponse apiResponse = new ApiResponse();
         try {
-            resp.setContentType("application/json");
-            resp.setCharacterEncoding("UTF-8");
             out = resp.getWriter();
-            List<String> parameterNames = new ArrayList<String>(req.getParameterMap().keySet());
-            List<String> requiredParams = new ArrayList<String>();
-            requiredParams.add("name");
-            requiredParams.add("username");
-            requiredParams.add("password");
-            requiredParams.add("gender");
-            requiredParams.add("birthday");
-            if (!parameterNames.containsAll(requiredParams)) {
-                JSONObject invalidRequest = new JSONObject();
-                invalidRequest.put("message", "Missing user infomation");
-                apiResponse.setCode(ECode.INVALID_PARAM.getValue());
-                apiResponse.setData(invalidRequest);
-                out.println(apiResponse.getFinalResponse());
-            } else {
-                User newUser = new User();
-                newUser.setName(req.getParameter("name"));
-                newUser.setUsername(req.getParameter("username"));
-                newUser.setPassword(req.getParameter("password"));
-                newUser.setBirthday(DateTimeUtils.formatDateTime(req.getParameter("birthday")));
-                newUser.setGender(Gender.findByValue(Integer.parseInt(req.getParameter("gender"))));
-                JSONObject result = UserService.Instance.createUser(newUser);
-                out.println(result);
+            Object newUserParams = RequestUtils.createUserParams(req);
+            Object result = userService.createUser(newUserParams);
+            apiResponse = (ApiResponse) result;
+        } catch (NotExistException ex) {
+            _Logger.error(null, ex);
+            apiResponse.setCode(ECode.INVALID_PARAM.getValue());
+            try {
+                apiResponse.setData(apiResponse.createMessageError(ex.getMessage()));
+            } catch (JSONException ex1) {
+                _Logger.error(null, ex1);
+            }
+        } catch (ZInvalidParamException ex) {
+            _Logger.error(null, ex);
+            apiResponse.setCode(ex.getError());
+            try {
+                apiResponse.setData(apiResponse.createMessageError(ex.getMessage()));
+            } catch (JSONException ex1) {
+                _Logger.error(null, ex1);
             }
         } catch (Exception ex) {
             _Logger.error(null, ex);
+            apiResponse.setCode(ECode.C_FAIL.getValue());
+            try {
+                apiResponse.setData(apiResponse.createMessageError(ex.getMessage()));
+            } catch (JSONException ex1) {
+                _Logger.error(null, ex1);
+            }
         } finally {
-            if (out != null) {
-                out.close();
+            try {
+                out.println(apiResponse.getFinalResponse());
+                if (out != null) {
+                    out.close();
+                }
+            } catch (JSONException ex) {
+                _Logger.error(null, ex);
             }
         }
     }
 
     @Override
     protected void doDelete(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        ApiResponse apiResponse = new ApiResponse();
+        resp.setContentType("application/json");
+        resp.setCharacterEncoding("UTF-8");
         PrintWriter out = null;
+        ApiResponse apiResponse = new ApiResponse();
         try {
-            resp.setContentType("application/json");
-            resp.setCharacterEncoding("UTF-8");
             out = resp.getWriter();
-            List<String> parameterNames = new ArrayList<String>(req.getParameterMap().keySet());
-            List<String> requiredParams = new ArrayList<String>();
-            requiredParams.add("id");
-            if (!parameterNames.containsAll(requiredParams)) {
-                JSONObject invalidRequest = new JSONObject();
-                invalidRequest.put("message", "Missing user infomation");
-                apiResponse.setCode(ECode.INVALID_PARAM.getValue());
-                apiResponse.setData(invalidRequest);
-                out.println(apiResponse.getFinalResponse());
-            } else {
-                JSONObject result = UserService.Instance.deleteUser(Integer.parseInt(req.getParameter("id")));
-                out.println(result);
+            int id = HReqParam.getInt(req, "id");
+            Object result = userService.deleteUser(id);
+            apiResponse = (ApiResponse) result;
+        } catch (NotExistException ex) {
+            _Logger.error(null, ex);
+            apiResponse.setCode(ECode.INVALID_PARAM.getValue());
+            try {
+                apiResponse.setData(apiResponse.createMessageError("Missing user ID"));
+            } catch (JSONException ex1) {
+                _Logger.error(null, ex1);
+            }
+        } catch (ZInvalidParamException ex) {
+            _Logger.error(null, ex);
+            apiResponse.setCode(ex.getError());
+            try {
+                apiResponse.setData(apiResponse.createMessageError(ex.getMessage()));
+            } catch (JSONException ex1) {
+                _Logger.error(null, ex1);
             }
         } catch (Exception ex) {
             _Logger.error(null, ex);
+            apiResponse.setCode(ECode.C_FAIL.getValue());
+            try {
+                apiResponse.setData(apiResponse.createMessageError(ex.getMessage()));
+            } catch (JSONException ex1) {
+                _Logger.error(null, ex1);
+            }
         } finally {
-            if (out != null) {
-                out.close();
+            try {
+                out.println(apiResponse.getFinalResponse());
+                if (out != null) {
+                    out.close();
+                }
+            } catch (JSONException ex) {
+                _Logger.error(null, ex);
             }
         }
     }

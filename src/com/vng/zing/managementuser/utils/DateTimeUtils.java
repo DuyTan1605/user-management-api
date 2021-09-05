@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.vng.zing.utils;
+package com.vng.zing.managementuser.utils;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
@@ -28,9 +28,4 @@ public class DateTimeUtils {
         return dateFormat.atZone(ZoneId.of("Asia/Ho_Chi_Minh")).toInstant().toEpochMilli();
     }
 
-    public static java.sql.Date convertUtilToSql(long msSeconds) {
-        java.util.Date uDate = new java.util.Date(msSeconds);
-        java.sql.Date sDate = new java.sql.Date(uDate.getTime());
-        return sDate;
-    }
 }

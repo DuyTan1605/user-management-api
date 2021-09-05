@@ -23,6 +23,9 @@ public class UserDTO {
     private String createTime;
     private String updateTime;
 
+    public UserDTO() {
+    }
+
     public UserDTO(int id, String name, String userName, Gender gender, String birthday, String createTime, String updateTime) {
         this.id = id;
         this.name = name;
