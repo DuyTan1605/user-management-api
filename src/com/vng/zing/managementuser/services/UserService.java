@@ -54,12 +54,14 @@ public class UserService {
             DetailUserResult result = client.getUser(new DetailUserParams(id));
             profiler.push(this.getClass(), "output");
             apiResponse.setCode(result.getCode());
-            if (result.getData() != null) {
+            if (result.getCode() == 0) {
                 User user = result.getData();
                 UserDTO myUserDTO = new UserDTO(user.id, user.name, user.username, user.gender, DateTimeUtils.getLocalDateTime(user.birthday), DateTimeUtils.getLocalDateTime(user.createtime), DateTimeUtils.getLocalDateTime(user.updatetime));
                 temp = myUserDTO.getUserResponse();
+                apiResponse.setData(new JSONObject().put("user", temp));
+            } else {
+                apiResponse.setData(new JSONObject().put("user", JSONObject.NULL));
             }
-            apiResponse.setData(new JSONObject().put("user", temp));
             profiler.pop(this.getClass(), "output");
             return apiResponse;
         }
