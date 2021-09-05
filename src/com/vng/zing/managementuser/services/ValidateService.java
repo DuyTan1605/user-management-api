@@ -19,7 +19,7 @@ import org.json.simple.parser.ParseException;
 public class ValidateService {
 
     public boolean validateName(String name) {
-        if (name == null || name == "") {
+        if (name == null || name.trim().isEmpty()) {
             return false;
         } else {
             String regex = "^[A-Za-z]\\w{5,29}$";
@@ -30,7 +30,7 @@ public class ValidateService {
     }
 
     public boolean validateUserName(String userName) {
-        if (userName == null || userName == "") {
+        if (userName == null || userName.trim().isEmpty()) {
             return false;
         } else {
             String regex = "^[A-Za-z0-9]\\w{5,29}$";
@@ -41,7 +41,7 @@ public class ValidateService {
     }
 
     public boolean validatePassword(String password) {
-        if (password == null || password == "") {
+        if (password == null || password.trim().isEmpty()) {
             return false;
         } else {
             String regex = "^(?=.*[0-9])"
@@ -55,7 +55,7 @@ public class ValidateService {
     }
 
     public boolean validateBirthday(String birthday) {
-        if (birthday == null || birthday == "") {
+        if (birthday == null || birthday.trim().isEmpty()) {
             return false;
         } else {
             String regex = "^\\d{4}-\\d{2}-\\d{2}\\s\\d{2}:\\d{2}:\\d{2}$";

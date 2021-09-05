@@ -44,7 +44,7 @@ public class UserHandler extends HttpServlet {
             apiResponse = (ApiResponse) result;
         } catch (NotExistException ex) {
             _Logger.error(null, ex);
-            apiResponse.setCode(ECode.INVALID_PARAM.getValue());
+            apiResponse.setCode(-ECode.INVALID_PARAM.getValue());
             try {
                 apiResponse.setData(apiResponse.createMessageError("Missing credentials"));
             } catch (JSONException ex1) {
@@ -60,7 +60,7 @@ public class UserHandler extends HttpServlet {
             }
         } catch (Exception ex) {
             _Logger.error(null, ex);
-            apiResponse.setCode(ECode.C_FAIL.getValue());
+            apiResponse.setCode(-ECode.C_FAIL.getValue());
             try {
                 apiResponse.setData(apiResponse.createMessageError(ex.getMessage()));
             } catch (JSONException ex1) {
@@ -91,7 +91,7 @@ public class UserHandler extends HttpServlet {
             apiResponse = (ApiResponse) result;
         } catch (NotExistException ex) {
             _Logger.error(null, ex);
-            apiResponse.setCode(ECode.INVALID_PARAM.getValue());
+            apiResponse.setCode(-ECode.INVALID_PARAM.getValue());
             try {
                 apiResponse.setData(apiResponse.createMessageError("Missing user ID"));
             } catch (JSONException ex1) {
@@ -107,7 +107,7 @@ public class UserHandler extends HttpServlet {
             }
         } catch (Exception ex) {
             _Logger.error(null, ex);
-            apiResponse.setCode(ECode.C_FAIL.getValue());
+            apiResponse.setCode(-ECode.C_FAIL.getValue());
             try {
                 apiResponse.setData(apiResponse.createMessageError(ex.getMessage()));
             } catch (JSONException ex1) {
@@ -138,9 +138,9 @@ public class UserHandler extends HttpServlet {
             apiResponse = (ApiResponse) result;
         } catch (NotExistException ex) {
             _Logger.error(null, ex);
-            apiResponse.setCode(ECode.INVALID_PARAM.getValue());
+            apiResponse.setCode(-ECode.INVALID_PARAM.getValue());
             try {
-                apiResponse.setData(apiResponse.createMessageError(ex.getMessage()));
+                apiResponse.setData(apiResponse.createMessageError("Missing credentials"));
             } catch (JSONException ex1) {
                 _Logger.error(null, ex1);
             }
@@ -154,7 +154,7 @@ public class UserHandler extends HttpServlet {
             }
         } catch (Exception ex) {
             _Logger.error(null, ex);
-            apiResponse.setCode(ECode.C_FAIL.getValue());
+            apiResponse.setCode(-ECode.C_FAIL.getValue());
             try {
                 apiResponse.setData(apiResponse.createMessageError(ex.getMessage()));
             } catch (JSONException ex1) {
@@ -185,7 +185,7 @@ public class UserHandler extends HttpServlet {
             apiResponse = (ApiResponse) result;
         } catch (NotExistException ex) {
             _Logger.error(null, ex);
-            apiResponse.setCode(ECode.INVALID_PARAM.getValue());
+            apiResponse.setCode(-ECode.INVALID_PARAM.getValue());
             try {
                 apiResponse.setData(apiResponse.createMessageError("Missing user ID"));
             } catch (JSONException ex1) {
@@ -201,7 +201,7 @@ public class UserHandler extends HttpServlet {
             }
         } catch (Exception ex) {
             _Logger.error(null, ex);
-            apiResponse.setCode(ECode.C_FAIL.getValue());
+            apiResponse.setCode(-ECode.C_FAIL.getValue());
             try {
                 apiResponse.setData(apiResponse.createMessageError(ex.getMessage()));
             } catch (JSONException ex1) {

@@ -34,7 +34,7 @@ public class UserListHandler extends HttpServlet {
             apiResponse = (ApiResponse) result;
         } catch (Exception ex) {
             _Logger.error(null, ex);
-            apiResponse.setCode(ECode.C_FAIL.getValue());
+            apiResponse.setCode(-ECode.C_FAIL.getValue());
             apiResponse.setData(null);
         } finally {
             try {
