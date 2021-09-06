@@ -9,7 +9,6 @@ import com.vng.zing.dmp.common.exception.ZInvalidParamException;
 import com.vng.zing.dmp.common.exception.ZUnknownException;
 import com.vng.zing.exception.InvalidParamException;
 import com.vng.zing.exception.NotExistException;
-import com.vng.zing.logger.ZLogger;
 import com.vng.zing.managementuser.entity.ApiResponse;
 import com.vng.zing.managementuser.entity.UserDTO;
 import com.vng.zing.userservice.thrift.CreateUserParams;
@@ -23,7 +22,6 @@ import com.vng.zing.userservice.thrift.UpdateUserResult;
 import com.vng.zing.userservice.thrift.User;
 import com.vng.zing.userservice.thrift.wrapper.UserMwClient;
 import com.vng.zing.managementuser.utils.DateTimeUtils;
-import org.apache.log4j.Logger;
 import org.apache.thrift.TException;
 import org.json.JSONException;
 import org.json.simple.parser.ParseException;
@@ -34,7 +32,6 @@ import org.json.simple.parser.ParseException;
  */
 public class UserService {
 
-    private static final Logger _Logger = ZLogger.getLogger(UserListService.class);
     private UserMwClient client = new UserMwClient("Main");
     private ValidateService validateService = new ValidateService();
 
