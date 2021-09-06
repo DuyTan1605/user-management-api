@@ -59,7 +59,7 @@ public class UserHandler extends HttpServlet {
         try {
             out = resp.getWriter();
             User putUserParams = RequestUtils.updateUserParams(req);
-            Object result = userService.updateUser(putUserParams);
+            String result = userService.updateUser(putUserParams);
             apiResponse.setCode(ECode.C_SUCCESS.getValue());
             apiResponse.setData(result);
         } catch (Exception ex) {
@@ -136,7 +136,7 @@ public class UserHandler extends HttpServlet {
         try {
             out = resp.getWriter();
             int id = HReqParam.getInt(req, "id");
-            Object result = userService.deleteUser(id);
+            String result = userService.deleteUser(id);
             apiResponse.setCode(ECode.C_SUCCESS.getValue());
             apiResponse.setData(result);
         } catch (Exception ex) {
