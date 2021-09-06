@@ -32,7 +32,7 @@ import org.codehaus.jackson.map.ObjectMapper;
 public class UserHandler extends HttpServlet {
 
     private static final Logger logger = ZLogger.getLogger(UserHandler.class);
-    private final UserService userService = new UserService();
+    private UserService userService = new UserService();
 
     private int handleErrorCode(Exception ex) {
         int errorCode = -ECode.EXCEPTION.getValue();
@@ -63,7 +63,7 @@ public class UserHandler extends HttpServlet {
             apiResponse.setCode(ECode.C_SUCCESS.getValue());
             apiResponse.setData(result);
         } catch (Exception ex) {
-            logger.error(null, ex);
+            logger.error(ex);
             apiResponse.setCode(handleErrorCode(ex));
             apiResponse.setData(ex.getMessage());
         } finally {
@@ -88,7 +88,7 @@ public class UserHandler extends HttpServlet {
             apiResponse.setCode(ECode.C_SUCCESS.getValue());
             apiResponse.setData(result);
         } catch (Exception ex) {
-            logger.error(null, ex);
+            logger.error(ex);
             apiResponse.setCode(handleErrorCode(ex));
             apiResponse.setData(ex.getMessage());
         } finally {
@@ -114,7 +114,7 @@ public class UserHandler extends HttpServlet {
             apiResponse.setCode(ECode.C_SUCCESS.getValue());
             apiResponse.setData(result);
         } catch (Exception ex) {
-            logger.error(null, ex);
+            logger.error(ex);
             apiResponse.setCode(handleErrorCode(ex));
             apiResponse.setData(ex.getMessage());
         } finally {
@@ -140,7 +140,7 @@ public class UserHandler extends HttpServlet {
             apiResponse.setCode(ECode.C_SUCCESS.getValue());
             apiResponse.setData(result);
         } catch (Exception ex) {
-            logger.error(null, ex);
+            logger.error(ex);
             apiResponse.setCode(handleErrorCode(ex));
             apiResponse.setData(ex.getMessage());
         } finally {
