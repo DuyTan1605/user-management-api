@@ -12,7 +12,6 @@ import com.vng.zing.userservice.thrift.Gender;
 import com.vng.zing.userservice.thrift.User;
 import javax.servlet.http.HttpServletRequest;
 import org.json.JSONException;
-import org.json.JSONObject;
 
 /**
  *
@@ -20,47 +19,19 @@ import org.json.JSONObject;
  */
 public class RequestUtils {
 
-    public static Object createUserParams(HttpServletRequest req) throws JSONException, NotExistException, InvalidParamException {
-        JSONObject result = new JSONObject();
-        result.put("name", HReqParam.getString(req, "name"));
-        result.put("username", HReqParam.getString(req, "username"));
-        result.put("birthday", HReqParam.getString(req, "birthday"));
-        result.put("password", HReqParam.getString(req, "password"));
-        result.put("gender", HReqParam.getInt(req, "gender"));
-        return result;
-    }
-
-    public static Object updateUserParams(HttpServletRequest req) throws JSONException, NotExistException, InvalidParamException {
-        JSONObject result = new JSONObject();
-        result.put("id", HReqParam.getInt(req, "id"));
-        result.put("name", HReqParam.getString(req, "name"));
-        result.put("username", HReqParam.getString(req, "username"));
-        result.put("birthday", HReqParam.getString(req, "birthday"));
-        result.put("password", HReqParam.getString(req, "password"));
-        result.put("gender", HReqParam.getInt(req, "gender"));
-        return result;
-    }
-
-    public static User parseUpdateUserParams(Object newUser) throws JSONException, NotExistException, InvalidParamException {
-        JSONObject jsonUser = (JSONObject) newUser;
+    public static User createUserParams(HttpServletRequest req) throws JSONException, NotExistException, InvalidParamException {
         User user = new User();
-        user.setId(Integer.parseInt(jsonUser.getString("id")));
-        user.setName(jsonUser.getString("name"));
-        user.setUsername(jsonUser.getString("username"));
-        user.setPassword(jsonUser.getString("password"));
-        user.setBirthday(DateTimeUtils.formatDateTime(jsonUser.getString("birthday")));
-        user.setGender(Gender.findByValue(Integer.parseInt(jsonUser.getString("gender"))));
+        user.setName(HReqParam.getString(req, "name"));
+        user.setUsername(HReqParam.getString(req, "username"));
+        user.setBirthday(DateTimeUtils.formatDateTime(HReqParam.getString(req, "birthday")));
+        user.setPassword(HReqParam.getString(req, "password"));
+        user.setGender(Gender.findByValue(HReqParam.getInt(req, "gender")));
         return user;
     }
 
-    public static User parseCreateUserParams(Object newUser) throws JSONException, NotExistException, InvalidParamException {
-        JSONObject jsonUser = (JSONObject) newUser;
-        User user = new User();
-        user.setName(jsonUser.getString("name"));
-        user.setUsername(jsonUser.getString("username"));
-        user.setPassword(jsonUser.getString("password"));
-        user.setBirthday(DateTimeUtils.formatDateTime(jsonUser.getString("birthday")));
-        user.setGender(Gender.findByValue(Integer.parseInt(jsonUser.getString("gender"))));
+    public static User updateUserParams(HttpServletRequest req) throws JSONException, NotExistException, InvalidParamException {
+        User user = createUserParams(req);
+        user.setId(HReqParam.getInt(req, "id"));
         return user;
     }
 }

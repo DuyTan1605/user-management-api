@@ -6,10 +6,10 @@
 package com.vng.zing.managementuser.services;
 
 import com.vng.zing.dmp.common.exception.ZInvalidParamException;
+import com.vng.zing.userservice.thrift.User;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.json.JSONException;
-import org.json.JSONObject;
 import org.json.simple.parser.ParseException;
 
 /**
@@ -54,59 +54,16 @@ public class ValidateService {
         }
     }
 
-    public boolean validateBirthday(String birthday) {
-        if (birthday == null || birthday.trim().isEmpty()) {
-            return false;
-        } else {
-            String regex = "^\\d{4}-\\d{2}-\\d{2}\\s\\d{2}:\\d{2}:\\d{2}$";
-            Pattern p = Pattern.compile(regex);
-            Matcher m = p.matcher(birthday);
-            return m.matches();
+    public void validateCreateUserParams(User user) throws ParseException, JSONException {
+        if (user.birthday <= 0 || (user.gender.getValue() != 1 && user.gender.getValue() != 0) || !validateName(user.name) || !validateUserName(user.username) || !validatePassword(user.password)) {
+            throw new ZInvalidParamException("User data " + user + " not valid");
         }
     }
 
-    public boolean validateGender(int gender) {
-        if (gender != 0 && gender != 1) {
-            return false;
-        }
-        return true;
-    }
-
-    public boolean validateId(int id) {
-        if (id == (int) id && id > 0) {
-            return true;
-        }
-        return false;
-    }
-
-    public void validateCreateUserParams(Object user) throws ParseException, JSONException {
-        JSONObject userObject = (JSONObject) user;
-
-        String name = userObject.getString("name");
-        String userName = userObject.getString("username");
-        String password = userObject.getString("password");
-        String birthday = userObject.getString("birthday");
-        int gender = userObject.getInt("gender");
-        if (!validateName(name)) {
-            throw new ZInvalidParamException("Name is not valid");
-        } else if (!validateName(userName)) {
-            throw new ZInvalidParamException("User name is not valid");
-        } else if (!validatePassword(password)) {
-            throw new ZInvalidParamException("Password is not valid");
-        } else if (!validateBirthday(birthday)) {
-            throw new ZInvalidParamException("Birthday is not valid");
-        } else if (!validateGender(gender)) {
-            throw new ZInvalidParamException("Gender is not valid");
-        }
-    }
-
-    public void validateUpdateUserParams(Object user) throws ParseException, JSONException {
+    public void validateUpdateUserParams(User user) throws ParseException, JSONException {
         validateCreateUserParams(user);
-        JSONObject userObject = (JSONObject) user;
-        int id = userObject.getInt("id");
-
-        if (!validateId(id)) {
-            throw new ZInvalidParamException("ID is not valid");
+        if (user.id <= 0) {
+            throw new ZInvalidParamException("User data " + user + " not valid");
         }
     }
 }

@@ -7,11 +7,14 @@ package com.vng.zing.managementuser.handlers;
 
 import com.vng.zing.common.HReqParam;
 import com.vng.zing.dmp.common.exception.ZInvalidParamException;
-import com.vng.zing.exception.NotExistException;
+import com.vng.zing.dmp.common.exception.ZNotExistException;
+import com.vng.zing.dmp.common.exception.ZRemoteFailureException;
 import com.vng.zing.logger.ZLogger;
 import com.vng.zing.managementuser.entity.ApiResponse;
+import com.vng.zing.managementuser.entity.UserDTO;
 import com.vng.zing.managementuser.services.UserService;
 import com.vng.zing.managementuser.utils.RequestUtils;
+import com.vng.zing.userservice.thrift.User;
 import com.vng.zing.zcommon.thrift.ECode;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -20,7 +23,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.apache.log4j.Logger;
-import org.json.JSONException;
+import org.codehaus.jackson.map.ObjectMapper;
 
 /**
  *
@@ -28,99 +31,70 @@ import org.json.JSONException;
  */
 public class UserHandler extends HttpServlet {
 
-    private static final Logger _Logger = ZLogger.getLogger(UserHandler.class);
+    private static final Logger logger = ZLogger.getLogger(UserHandler.class);
     private final UserService userService = new UserService();
+
+    private int handleErrorCode(Exception ex) {
+        int errorCode = -ECode.EXCEPTION.getValue();
+        if (ex instanceof ZInvalidParamException) {
+            errorCode = -ECode.INVALID_PARAM.getValue();
+        }
+        if (ex instanceof ZRemoteFailureException) {
+            errorCode = -ECode.C_FAIL.getValue();
+        }
+        if (ex instanceof ZNotExistException) {
+            errorCode = -ECode.NOT_EXIST.getValue();
+        }
+        return errorCode;
+    }
 
     @Override
     protected void doPut(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         PrintWriter out = null;
+        resp.addHeader("Access-Control-Allow-Origin", "*");
         resp.setContentType("application/json");
         resp.setCharacterEncoding("UTF-8");
         ApiResponse apiResponse = new ApiResponse();
+        ObjectMapper objectMapper = new ObjectMapper();
         try {
             out = resp.getWriter();
-            Object putUserParams = RequestUtils.updateUserParams(req);
+            User putUserParams = RequestUtils.updateUserParams(req);
             Object result = userService.updateUser(putUserParams);
-            apiResponse = (ApiResponse) result;
-        } catch (NotExistException ex) {
-            _Logger.error(null, ex);
-            apiResponse.setCode(-ECode.INVALID_PARAM.getValue());
-            try {
-                apiResponse.setData(apiResponse.createMessageError("Missing credentials"));
-            } catch (JSONException ex1) {
-                _Logger.error(null, ex1);
-            }
-        } catch (ZInvalidParamException ex) {
-            _Logger.error(null, ex);
-            apiResponse.setCode(ex.getError());
-            try {
-                apiResponse.setData(apiResponse.createMessageError(ex.getMessage()));
-            } catch (JSONException ex1) {
-                _Logger.error(null, ex1);
-            }
+            apiResponse.setCode(ECode.C_SUCCESS.getValue());
+            apiResponse.setData(result);
         } catch (Exception ex) {
-            _Logger.error(null, ex);
-            apiResponse.setCode(-ECode.C_FAIL.getValue());
-            try {
-                apiResponse.setData(apiResponse.createMessageError(ex.getMessage()));
-            } catch (JSONException ex1) {
-                _Logger.error(null, ex1);
-            }
+            logger.error(null, ex);
+            apiResponse.setCode(handleErrorCode(ex));
+            apiResponse.setData(ex.getMessage());
         } finally {
-            try {
-                out.println(apiResponse.getFinalResponse());
-                if (out != null) {
-                    out.close();
-                }
-            } catch (JSONException ex) {
-                _Logger.error(null, ex);
+            out.println(objectMapper.writeValueAsString(apiResponse));
+            if (out != null) {
+                out.close();
             }
         }
     }
 
     @Override
-    protected void doGet(HttpServletRequest req, HttpServletResponse resp) {
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        resp.addHeader("Access-Control-Allow-Origin", "*");
         resp.setContentType("application/json");
         resp.setCharacterEncoding("UTF-8");
         PrintWriter out = null;
         ApiResponse apiResponse = new ApiResponse();
+        ObjectMapper objectMapper = new ObjectMapper();
         try {
             out = resp.getWriter();
-            int id = HReqParam.getInt(req, "id");
-            Object result = userService.getUser(id);
-            apiResponse = (ApiResponse) result;
-        } catch (NotExistException ex) {
-            _Logger.error(null, ex);
-            apiResponse.setCode(-ECode.INVALID_PARAM.getValue());
-            try {
-                apiResponse.setData(apiResponse.createMessageError("Missing user ID"));
-            } catch (JSONException ex1) {
-                _Logger.error(null, ex1);
-            }
-        } catch (ZInvalidParamException ex) {
-            _Logger.error(null, ex);
-            apiResponse.setCode(ex.getError());
-            try {
-                apiResponse.setData(apiResponse.createMessageError(ex.getMessage()));
-            } catch (JSONException ex1) {
-                _Logger.error(null, ex1);
-            }
+            UserDTO result = userService.getUser(HReqParam.getInt(req, "id"));
+            apiResponse.setCode(ECode.C_SUCCESS.getValue());
+            apiResponse.setData(result);
         } catch (Exception ex) {
-            _Logger.error(null, ex);
-            apiResponse.setCode(-ECode.C_FAIL.getValue());
-            try {
-                apiResponse.setData(apiResponse.createMessageError(ex.getMessage()));
-            } catch (JSONException ex1) {
-                _Logger.error(null, ex1);
-            }
+            logger.error(null, ex);
+            apiResponse.setCode(handleErrorCode(ex));
+            apiResponse.setData(ex.getMessage());
         } finally {
-            try {
-                out.println(apiResponse.getFinalResponse());
-                if (out != null) {
-                    out.close();
-                }
-            } catch (JSONException ex) {
-                _Logger.error(null, ex);
+            out.println(objectMapper.writeValueAsString(apiResponse));
+            if (out != null) {
+                out.close();
             }
         }
     }
@@ -128,93 +102,51 @@ public class UserHandler extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         PrintWriter out = null;
+        resp.addHeader("Access-Control-Allow-Origin", "*");
         resp.setContentType("application/json");
         resp.setCharacterEncoding("UTF-8");
         ApiResponse apiResponse = new ApiResponse();
+        ObjectMapper objectMapper = new ObjectMapper();
         try {
             out = resp.getWriter();
-            Object newUserParams = RequestUtils.createUserParams(req);
-            Object result = userService.createUser(newUserParams);
-            apiResponse = (ApiResponse) result;
-        } catch (NotExistException ex) {
-            _Logger.error(null, ex);
-            apiResponse.setCode(-ECode.INVALID_PARAM.getValue());
-            try {
-                apiResponse.setData(apiResponse.createMessageError("Missing credentials"));
-            } catch (JSONException ex1) {
-                _Logger.error(null, ex1);
-            }
-        } catch (ZInvalidParamException ex) {
-            _Logger.error(null, ex);
-            apiResponse.setCode(ex.getError());
-            try {
-                apiResponse.setData(apiResponse.createMessageError(ex.getMessage()));
-            } catch (JSONException ex1) {
-                _Logger.error(null, ex1);
-            }
+            User newUserParams = RequestUtils.createUserParams(req);
+            String result = userService.createUser(newUserParams);
+            apiResponse.setCode(ECode.C_SUCCESS.getValue());
+            apiResponse.setData(result);
         } catch (Exception ex) {
-            _Logger.error(null, ex);
-            apiResponse.setCode(-ECode.C_FAIL.getValue());
-            try {
-                apiResponse.setData(apiResponse.createMessageError(ex.getMessage()));
-            } catch (JSONException ex1) {
-                _Logger.error(null, ex1);
-            }
+            logger.error(null, ex);
+            apiResponse.setCode(handleErrorCode(ex));
+            apiResponse.setData(ex.getMessage());
         } finally {
-            try {
-                out.println(apiResponse.getFinalResponse());
-                if (out != null) {
-                    out.close();
-                }
-            } catch (JSONException ex) {
-                _Logger.error(null, ex);
+            out.println(objectMapper.writeValueAsString(apiResponse));
+            if (out != null) {
+                out.close();
             }
         }
     }
 
     @Override
     protected void doDelete(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        resp.addHeader("Access-Control-Allow-Origin", "*");
         resp.setContentType("application/json");
         resp.setCharacterEncoding("UTF-8");
         PrintWriter out = null;
         ApiResponse apiResponse = new ApiResponse();
+        ObjectMapper objectMapper = new ObjectMapper();
         try {
             out = resp.getWriter();
             int id = HReqParam.getInt(req, "id");
             Object result = userService.deleteUser(id);
-            apiResponse = (ApiResponse) result;
-        } catch (NotExistException ex) {
-            _Logger.error(null, ex);
-            apiResponse.setCode(-ECode.INVALID_PARAM.getValue());
-            try {
-                apiResponse.setData(apiResponse.createMessageError("Missing user ID"));
-            } catch (JSONException ex1) {
-                _Logger.error(null, ex1);
-            }
-        } catch (ZInvalidParamException ex) {
-            _Logger.error(null, ex);
-            apiResponse.setCode(ex.getError());
-            try {
-                apiResponse.setData(apiResponse.createMessageError(ex.getMessage()));
-            } catch (JSONException ex1) {
-                _Logger.error(null, ex1);
-            }
+            apiResponse.setCode(ECode.C_SUCCESS.getValue());
+            apiResponse.setData(result);
         } catch (Exception ex) {
-            _Logger.error(null, ex);
-            apiResponse.setCode(-ECode.C_FAIL.getValue());
-            try {
-                apiResponse.setData(apiResponse.createMessageError(ex.getMessage()));
-            } catch (JSONException ex1) {
-                _Logger.error(null, ex1);
-            }
+            logger.error(null, ex);
+            apiResponse.setCode(handleErrorCode(ex));
+            apiResponse.setData(ex.getMessage());
         } finally {
-            try {
-                out.println(apiResponse.getFinalResponse());
-                if (out != null) {
-                    out.close();
-                }
-            } catch (JSONException ex) {
-                _Logger.error(null, ex);
+            out.println(objectMapper.writeValueAsString(apiResponse));
+            if (out != null) {
+                out.close();
             }
         }
     }

@@ -5,9 +5,6 @@
  */
 package com.vng.zing.managementuser.entity;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
 /**
  *
  * @author tanhd
@@ -27,23 +24,20 @@ public class ApiResponse {
         this.data = data;
     }
 
-    public JSONObject getFinalResponse() throws JSONException {
-        JSONObject result = new JSONObject();
-        result.put("code", this.code);
-        result.put("data", this.data);
-        return result;
-    }
-
-    public JSONObject createMessageError(String message) throws JSONException {
-        return new JSONObject().put("message", message);
-    }
-
     public void setCode(int code) {
         this.code = code;
     }
 
     public void setData(Object data) {
         this.data = data;
+    }
+
+    public int getCode() {
+        return code;
+    }
+
+    public Object getData() {
+        return data;
     }
 
 }
