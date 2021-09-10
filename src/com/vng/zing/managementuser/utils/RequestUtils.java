@@ -30,8 +30,12 @@ public class RequestUtils {
     }
 
     public static User updateUserParams(HttpServletRequest req) throws JSONException, NotExistException, InvalidParamException {
-        User user = createUserParams(req);
+        User user = new User();
         user.setId(HReqParam.getInt(req, "id"));
+        user.setName(HReqParam.getString(req, "name"));
+        user.setUsername(HReqParam.getString(req, "username"));
+        user.setBirthday(DateTimeUtils.formatDateTime(HReqParam.getString(req, "birthday")));
+        user.setGender(Gender.findByValue(HReqParam.getInt(req, "gender")));
         return user;
     }
 }

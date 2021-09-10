@@ -30,10 +30,10 @@ import org.codehaus.jackson.map.ObjectMapper;
  * @author tanhd
  */
 public class UserHandler extends HttpServlet {
-
+    
     private static final Logger logger = ZLogger.getLogger(UserHandler.class);
     private UserService userService = new UserService();
-
+    
     private int handleErrorCode(Exception ex) {
         int errorCode = -ECode.EXCEPTION.getValue();
         if (ex instanceof ZInvalidParamException) {
@@ -47,7 +47,7 @@ public class UserHandler extends HttpServlet {
         }
         return errorCode;
     }
-
+    
     @Override
     protected void doPut(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         PrintWriter out = null;
@@ -73,7 +73,7 @@ public class UserHandler extends HttpServlet {
             }
         }
     }
-
+    
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         resp.setHeader("Access-Control-Allow-Origin", "*");
@@ -98,21 +98,21 @@ public class UserHandler extends HttpServlet {
             }
         }
     }
-
+    
     private void setAccessControlHeaders(HttpServletResponse resp) {
         resp.setHeader("Access-Control-Allow-Credentials", "true");
         resp.setHeader("Access-Control-Allow-Origin", "*");
         resp.setHeader("Access-Control-Allow-Methods", "POST,PUT,DELETE");
         resp.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
     }
-
+    
     @Override
     protected void doOptions(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
         setAccessControlHeaders(resp);
         super.doOptions(req, resp);
     }
-
+    
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         setAccessControlHeaders(resp);
@@ -124,6 +124,7 @@ public class UserHandler extends HttpServlet {
         try {
             out = resp.getWriter();
             User newUserParams = RequestUtils.createUserParams(req);
+            System.out.println(newUserParams);
             String result = userService.createUser(newUserParams);
             apiResponse.setCode(ECode.C_SUCCESS.getValue());
             apiResponse.setData(result);
@@ -138,7 +139,7 @@ public class UserHandler extends HttpServlet {
             }
         }
     }
-
+    
     @Override
     protected void doDelete(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         resp.setHeader("Access-Control-Allow-Origin", "*");
