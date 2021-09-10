@@ -51,7 +51,7 @@ public class UserHandler extends HttpServlet {
     @Override
     protected void doPut(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         PrintWriter out = null;
-        resp.addHeader("Access-Control-Allow-Origin", "*");
+        setAccessControlHeaders(resp);
         resp.setContentType("application/json");
         resp.setCharacterEncoding("UTF-8");
         ApiResponse apiResponse = new ApiResponse();
@@ -76,7 +76,7 @@ public class UserHandler extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-        resp.addHeader("Access-Control-Allow-Origin", "*");
+        resp.setHeader("Access-Control-Allow-Origin", "*");
         resp.setContentType("application/json");
         resp.setCharacterEncoding("UTF-8");
         PrintWriter out = null;
@@ -99,14 +99,28 @@ public class UserHandler extends HttpServlet {
         }
     }
 
+    private void setAccessControlHeaders(HttpServletResponse resp) {
+        resp.setHeader("Access-Control-Allow-Credentials", "true");
+        resp.setHeader("Access-Control-Allow-Origin", "*");
+        resp.setHeader("Access-Control-Allow-Methods", "POST,PUT,DELETE");
+        resp.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+    }
+
+    @Override
+    protected void doOptions(HttpServletRequest req, HttpServletResponse resp)
+            throws ServletException, IOException {
+        setAccessControlHeaders(resp);
+        super.doOptions(req, resp);
+    }
+
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        PrintWriter out = null;
-        resp.addHeader("Access-Control-Allow-Origin", "*");
+        setAccessControlHeaders(resp);
         resp.setContentType("application/json");
         resp.setCharacterEncoding("UTF-8");
         ApiResponse apiResponse = new ApiResponse();
         ObjectMapper objectMapper = new ObjectMapper();
+        PrintWriter out = null;
         try {
             out = resp.getWriter();
             User newUserParams = RequestUtils.createUserParams(req);
@@ -127,7 +141,7 @@ public class UserHandler extends HttpServlet {
 
     @Override
     protected void doDelete(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        resp.addHeader("Access-Control-Allow-Origin", "*");
+        resp.setHeader("Access-Control-Allow-Origin", "*");
         resp.setContentType("application/json");
         resp.setCharacterEncoding("UTF-8");
         PrintWriter out = null;
