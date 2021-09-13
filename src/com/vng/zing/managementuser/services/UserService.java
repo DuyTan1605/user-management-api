@@ -44,7 +44,10 @@ public class UserService {
         }
         DetailUserResult result = client.getUser(new DetailUserParams(id));
         UserDTO myUserDTO = null;
-        if (result.getData() != null) {
+        if (result.getCode() != 0) {
+            throw new ZUnknownException(result.getCode());
+        }
+        if (result.getCode() == 0 && result.getData() != null) {
             User user = result.getData();
             myUserDTO = new UserDTO();
             myUserDTO.setId(user.id);
@@ -83,7 +86,7 @@ public class UserService {
         }
         DeleteUserResult result = client.deleteUser(new DeleteUserParams(id));
         if (result.getCode() != 0) {
-            throw new ZUnknownException(result.getMessage());
+            throw new ZUnknownException(result.getCode(), result.getMessage());
         }
         return result.getMessage();
     }
