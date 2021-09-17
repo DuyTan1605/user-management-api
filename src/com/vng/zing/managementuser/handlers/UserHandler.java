@@ -5,6 +5,7 @@
  */
 package com.vng.zing.managementuser.handlers;
 
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.vng.zing.common.HReqParam;
 import com.vng.zing.dmp.common.exception.ZInvalidParamException;
 import com.vng.zing.dmp.common.exception.ZNotExistException;
@@ -14,8 +15,10 @@ import com.vng.zing.managementuser.entity.ApiResponse;
 import com.vng.zing.managementuser.entity.UserDTO;
 import com.vng.zing.managementuser.services.UserService;
 import com.vng.zing.managementuser.utils.RequestUtils;
+import com.vng.zing.stats.Profiler;
 import com.vng.zing.userservice.thrift.User;
 import com.vng.zing.zcommon.thrift.ECode;
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PrintWriter;
 import javax.servlet.ServletException;
@@ -30,10 +33,10 @@ import org.codehaus.jackson.map.ObjectMapper;
  * @author tanhd
  */
 public class UserHandler extends HttpServlet {
-    
+
     private static final Logger logger = ZLogger.getLogger(UserHandler.class);
     private UserService userService = new UserService();
-    
+
     private int handleErrorCode(Exception ex) {
         int errorCode = -ECode.EXCEPTION.getValue();
         if (ex instanceof ZInvalidParamException) {
@@ -47,9 +50,10 @@ public class UserHandler extends HttpServlet {
         }
         return errorCode;
     }
-    
+
     @Override
     protected void doPut(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        Profiler.createThreadProfilerInHttpProc("UserHandler.updateUser", req);
         PrintWriter out = null;
         setAccessControlHeaders(resp);
         resp.setContentType("application/json");
@@ -67,15 +71,17 @@ public class UserHandler extends HttpServlet {
             apiResponse.setCode(handleErrorCode(ex));
             apiResponse.setData(ex.getMessage());
         } finally {
+            Profiler.closeThreadProfiler();
             out.println(objectMapper.writeValueAsString(apiResponse));
             if (out != null) {
                 out.close();
             }
         }
     }
-    
+
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        Profiler.createThreadProfilerInHttpProc("UserHandler.getUser", req);
         resp.setHeader("Access-Control-Allow-Origin", "*");
         resp.setContentType("application/json");
         resp.setCharacterEncoding("UTF-8");
@@ -92,29 +98,31 @@ public class UserHandler extends HttpServlet {
             apiResponse.setCode(handleErrorCode(ex));
             apiResponse.setData(ex.getMessage());
         } finally {
+            Profiler.closeThreadProfiler();
             out.println(objectMapper.writeValueAsString(apiResponse));
             if (out != null) {
                 out.close();
             }
         }
     }
-    
+
     private void setAccessControlHeaders(HttpServletResponse resp) {
         resp.setHeader("Access-Control-Allow-Credentials", "true");
         resp.setHeader("Access-Control-Allow-Origin", "*");
         resp.setHeader("Access-Control-Allow-Methods", "POST,PUT,DELETE");
         resp.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
     }
-    
+
     @Override
     protected void doOptions(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
         setAccessControlHeaders(resp);
         super.doOptions(req, resp);
     }
-    
+
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        Profiler.createThreadProfilerInHttpProc("UserHandler.createUser", req);
         setAccessControlHeaders(resp);
         resp.setContentType("application/json");
         resp.setCharacterEncoding("UTF-8");
@@ -133,15 +141,17 @@ public class UserHandler extends HttpServlet {
             apiResponse.setCode(handleErrorCode(ex));
             apiResponse.setData(ex.getMessage());
         } finally {
+            Profiler.closeThreadProfiler();
             out.println(objectMapper.writeValueAsString(apiResponse));
             if (out != null) {
                 out.close();
             }
         }
     }
-    
+
     @Override
     protected void doDelete(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        Profiler.createThreadProfilerInHttpProc("UserHandler.deleteUser", req);
         resp.setHeader("Access-Control-Allow-Origin", "*");
         resp.setContentType("application/json");
         resp.setCharacterEncoding("UTF-8");
@@ -159,6 +169,7 @@ public class UserHandler extends HttpServlet {
             apiResponse.setCode(handleErrorCode(ex));
             apiResponse.setData(ex.getMessage());
         } finally {
+            Profiler.closeThreadProfiler();
             out.println(objectMapper.writeValueAsString(apiResponse));
             if (out != null) {
                 out.close();

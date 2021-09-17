@@ -11,6 +11,8 @@ import com.vng.zing.logger.ZLogger;
 import com.vng.zing.managementuser.entity.ApiResponse;
 import com.vng.zing.managementuser.entity.UserDTO;
 import com.vng.zing.managementuser.services.UserListService;
+import com.vng.zing.stats.Profiler;
+import com.vng.zing.stats.ThreadProfiler;
 import com.vng.zing.zcommon.thrift.ECode;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -44,6 +46,7 @@ public class UserListHandler extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        Profiler.createThreadProfilerInHttpProc("UserListHandler.getListUser", req);
         resp.setHeader("Access-Control-Allow-Origin", "*");
         resp.setContentType("application/json");
         resp.setCharacterEncoding("UTF-8");
@@ -59,6 +62,7 @@ public class UserListHandler extends HttpServlet {
             logger.error(ex);
             apiResponse.setCode(handleErrorCode(ex));
         } finally {
+            Profiler.closeThreadProfiler();
             out.println(objectMapper.writeValueAsString(apiResponse));
             if (out != null) {
                 out.close();

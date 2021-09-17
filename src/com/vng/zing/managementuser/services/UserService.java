@@ -22,6 +22,7 @@ import com.vng.zing.userservice.thrift.UpdateUserResult;
 import com.vng.zing.userservice.thrift.User;
 import com.vng.zing.userservice.thrift.wrapper.UserMwClient;
 import com.vng.zing.managementuser.utils.DateTimeUtils;
+import com.vng.zing.stats.Profiler;
 import org.apache.thrift.TException;
 import org.json.JSONException;
 import org.json.simple.parser.ParseException;
@@ -39,41 +40,58 @@ public class UserService {
     }
 
     public UserDTO getUser(int id) throws JSONException, TException {
-        if (id <= 0) {
-            throw new ZInvalidParamException("User ID is not valid");
-        }
-        DetailUserResult result = client.getUser(new DetailUserParams(id));
+        Profiler.getThreadProfiler().push(this.getClass(), "getUser");
         UserDTO myUserDTO = null;
-        if (result.getCode() != 0) {
-            throw new ZUnknownException(result.getCode());
-        }
-        if (result.getCode() == 0 && result.getData() != null) {
-            User user = result.getData();
-            myUserDTO = new UserDTO();
-            myUserDTO.setId(user.id);
-            myUserDTO.setName(user.name);
-            myUserDTO.setUserName(user.username);
-            myUserDTO.setGender(user.gender);
-            myUserDTO.setBirthday(DateTimeUtils.getLocalDateTime(user.birthday));
-            myUserDTO.setUpdateTime(DateTimeUtils.getLocalDateTime(user.updatetime));
-            myUserDTO.setCreateTime(DateTimeUtils.getLocalDateTime(user.createtime));
+        try {
+            if (id <= 0) {
+                throw new ZInvalidParamException("User ID is not valid");
+            }
+            DetailUserResult result = client.getUser(new DetailUserParams(id));
+            if (result.getCode() != 0) {
+                throw new ZUnknownException(result.getCode());
+            }
+            if (result.getCode() == 0 && result.getData() != null) {
+                User user = result.getData();
+                myUserDTO = new UserDTO();
+                myUserDTO.setId(user.id);
+                myUserDTO.setName(user.name);
+                myUserDTO.setUserName(user.username);
+                myUserDTO.setGender(user.gender);
+                myUserDTO.setBirthday(DateTimeUtils.getLocalDateTime(user.birthday));
+                myUserDTO.setUpdateTime(DateTimeUtils.getLocalDateTime(user.updatetime));
+                myUserDTO.setCreateTime(DateTimeUtils.getLocalDateTime(user.createtime));
+            }
+        } finally {
+            Profiler.getThreadProfiler().pop(this.getClass(), "getUser");
         }
         return myUserDTO;
     }
 
     public String updateUser(User newUser) throws JSONException, ParseException, NotExistException, InvalidParamException, TException {
-        validateService.validateUpdateUserParams(newUser);
-        UpdateUserResult result = client.updateUser(new UpdateUserParams(newUser));
-        if (result.getCode() != 0) {
-            throw new ZUnknownException(result.getMessage());
+        Profiler.getThreadProfiler().push(this.getClass(), "updateUser");
+        UpdateUserResult result = new UpdateUserResult();
+        try {
+            validateService.validateUpdateUserParams(newUser);
+            result = client.updateUser(new UpdateUserParams(newUser));
+            if (result.getCode() != 0) {
+                throw new ZUnknownException(result.getMessage());
+            }
+        } finally {
+            Profiler.getThreadProfiler().pop(this.getClass(), "updateUser");
         }
         return result.getMessage();
     }
 
     public String createUser(User newUser) throws JSONException, ParseException, TException, NotExistException, InvalidParamException {
-        ApiResponse apiResponse = new ApiResponse();
-        validateService.validateCreateUserParams(newUser);
-        CreateUserResult result = client.createUser(new CreateUserParams(newUser));
+        Profiler.getThreadProfiler().push(this.getClass(), "createUser");
+        CreateUserResult result = new CreateUserResult();
+        try {
+            ApiResponse apiResponse = new ApiResponse();
+            validateService.validateCreateUserParams(newUser);
+            result = client.createUser(new CreateUserParams(newUser));
+        } finally {
+            Profiler.getThreadProfiler().pop(this.getClass(), "createUser");
+        }
         if (result.getCode() != 0) {
             throw new ZUnknownException(result.getMessage());
         }
@@ -81,10 +99,16 @@ public class UserService {
     }
 
     public String deleteUser(int id) throws JSONException, TException {
-        if (id <= 0) {
-            throw new ZInvalidParamException("User ID is not valid");
+        Profiler.getThreadProfiler().push(this.getClass(), "deleteUser");
+        DeleteUserResult result = new DeleteUserResult();
+        try {
+            if (id <= 0) {
+                throw new ZInvalidParamException("User ID is not valid");
+            }
+            result = client.deleteUser(new DeleteUserParams(id));
+        } finally {
+            Profiler.getThreadProfiler().pop(this.getClass(), "deleteUser");
         }
-        DeleteUserResult result = client.deleteUser(new DeleteUserParams(id));
         if (result.getCode() != 0) {
             throw new ZUnknownException(result.getCode(), result.getMessage());
         }
