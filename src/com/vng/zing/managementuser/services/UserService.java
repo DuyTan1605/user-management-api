@@ -5,6 +5,7 @@
  */
 package com.vng.zing.managementuser.services;
 
+import com.google.inject.Inject;
 import com.vng.zing.dmp.common.exception.ZInvalidParamException;
 import com.vng.zing.dmp.common.exception.ZUnknownException;
 import com.vng.zing.exception.InvalidParamException;
@@ -34,9 +35,11 @@ import org.json.simple.parser.ParseException;
 public class UserService {
 
     private UserMwClient client = new UserMwClient("Main");
-    private ValidateService validateService = new ValidateService();
+    private ValidateService validateService;
 
-    public UserService() {
+    @Inject
+    public UserService(ValidateService validateService) {
+        this.validateService = validateService;
     }
 
     public UserDTO getUser(int id) throws JSONException, TException {

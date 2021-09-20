@@ -4,6 +4,7 @@
  */
 package com.vng.zing.managementuser.services;
 
+import com.google.inject.Inject;
 import com.vng.zing.logger.ZLogger;
 import com.vng.zing.managementuser.entity.ApiResponse;
 import com.vng.zing.managementuser.entity.UserDTO;
@@ -24,9 +25,11 @@ public class UserListService {
     private static final Logger logger = ZLogger.getLogger(UserListService.class);
     public static final UserMwClient client = new UserMwClient("Main");
 
-    private ApiResponse apiResponse = new ApiResponse();
-
-    public UserListService() {
+    private ApiResponse apiResponse;
+    
+    @Inject
+    public UserListService(ApiResponse apiResponse) {
+        this.apiResponse = apiResponse;
     }
 
     public List<UserDTO> getList() throws TException {

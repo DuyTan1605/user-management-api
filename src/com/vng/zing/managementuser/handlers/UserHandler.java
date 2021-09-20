@@ -6,6 +6,7 @@
 package com.vng.zing.managementuser.handlers;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.google.inject.Inject;
 import com.vng.zing.common.HReqParam;
 import com.vng.zing.dmp.common.exception.ZInvalidParamException;
 import com.vng.zing.dmp.common.exception.ZNotExistException;
@@ -35,7 +36,12 @@ import org.codehaus.jackson.map.ObjectMapper;
 public class UserHandler extends HttpServlet {
 
     private static final Logger logger = ZLogger.getLogger(UserHandler.class);
-    private UserService userService = new UserService();
+    private UserService userService;
+
+    @Inject
+    public UserHandler(UserService userService) {
+        this.userService = userService;
+    }
 
     private int handleErrorCode(Exception ex) {
         int errorCode = -ECode.EXCEPTION.getValue();
