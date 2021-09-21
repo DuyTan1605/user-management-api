@@ -5,13 +5,12 @@
 package com.vng.zing.managementuser;
 
 import com.google.inject.Guice;
+import com.google.inject.Inject;
 import com.google.inject.Injector;
 import com.vng.zing.jettyserver.WebServers;
 import com.vng.zing.managementuser.handlers.UserHandler;
 import com.vng.zing.managementuser.handlers.UserListHandler;
-import com.vng.zing.managementuser.modules.UserListModule;
-import com.vng.zing.managementuser.modules.UserListServiceModule;
-import com.vng.zing.managementuser.modules.UserServiceModule;
+import com.vng.zing.managementuser.modules.ProfilerModule;
 import com.vng.zing.managementuser.services.UserListService;
 import com.vng.zing.managementuser.services.UserService;
 import org.eclipse.jetty.servlet.ServletHandler;
@@ -19,16 +18,21 @@ import org.eclipse.jetty.servlet.ServletHolder;
 
 public class HServers {
 
+    private UserListHandler userListHandler;
+    private UserHandler userHandler;
+
+    @Inject
+    public HServers(UserListHandler userListHandler, UserHandler userHandler) {
+        this.userListHandler = userListHandler;
+        this.userHandler = userHandler;
+    }
+
     public boolean setupAndStart() {
         WebServers servers = new WebServers("managementuser");
         ServletHandler handler = new ServletHandler();
 
-        Injector injector = Guice.createInjector(new UserListServiceModule(), new UserServiceModule());
-        UserListService userListService = injector.getInstance(UserListService.class);
-        UserService userService = injector.getInstance(UserService.class);
-
-        handler.addServletWithMapping(new ServletHolder(new UserListHandler(userListService)), "/users");
-        handler.addServletWithMapping(new ServletHolder(new UserHandler(userService)), "/user");
+        handler.addServletWithMapping(new ServletHolder(userListHandler), "/users");
+        handler.addServletWithMapping(new ServletHolder(userHandler), "/user");
         servers.setup(handler);
         return servers.start();
     }

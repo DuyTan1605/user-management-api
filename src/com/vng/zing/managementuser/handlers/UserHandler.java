@@ -11,6 +11,7 @@ import com.vng.zing.common.HReqParam;
 import com.vng.zing.dmp.common.exception.ZInvalidParamException;
 import com.vng.zing.dmp.common.exception.ZNotExistException;
 import com.vng.zing.dmp.common.exception.ZRemoteFailureException;
+import com.vng.zing.dmp.common.interceptor.ThreadProfiler;
 import com.vng.zing.logger.ZLogger;
 import com.vng.zing.managementuser.entity.ApiResponse;
 import com.vng.zing.managementuser.entity.UserDTO;
@@ -57,9 +58,9 @@ public class UserHandler extends HttpServlet {
         return errorCode;
     }
 
+    @ThreadProfiler
     @Override
     protected void doPut(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        Profiler.createThreadProfilerInHttpProc("UserHandler.updateUser", req);
         PrintWriter out = null;
         setAccessControlHeaders(resp);
         resp.setContentType("application/json");
@@ -77,7 +78,6 @@ public class UserHandler extends HttpServlet {
             apiResponse.setCode(handleErrorCode(ex));
             apiResponse.setData(ex.getMessage());
         } finally {
-            Profiler.closeThreadProfiler();
             out.println(objectMapper.writeValueAsString(apiResponse));
             if (out != null) {
                 out.close();
@@ -85,9 +85,9 @@ public class UserHandler extends HttpServlet {
         }
     }
 
+    @ThreadProfiler
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-        Profiler.createThreadProfilerInHttpProc("UserHandler.getUser", req);
         resp.setHeader("Access-Control-Allow-Origin", "*");
         resp.setContentType("application/json");
         resp.setCharacterEncoding("UTF-8");
@@ -104,7 +104,6 @@ public class UserHandler extends HttpServlet {
             apiResponse.setCode(handleErrorCode(ex));
             apiResponse.setData(ex.getMessage());
         } finally {
-            Profiler.closeThreadProfiler();
             out.println(objectMapper.writeValueAsString(apiResponse));
             if (out != null) {
                 out.close();
@@ -119,6 +118,7 @@ public class UserHandler extends HttpServlet {
         resp.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
     }
 
+    @ThreadProfiler
     @Override
     protected void doOptions(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
@@ -126,9 +126,9 @@ public class UserHandler extends HttpServlet {
         super.doOptions(req, resp);
     }
 
+    @ThreadProfiler
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        Profiler.createThreadProfilerInHttpProc("UserHandler.createUser", req);
         setAccessControlHeaders(resp);
         resp.setContentType("application/json");
         resp.setCharacterEncoding("UTF-8");
@@ -147,7 +147,6 @@ public class UserHandler extends HttpServlet {
             apiResponse.setCode(handleErrorCode(ex));
             apiResponse.setData(ex.getMessage());
         } finally {
-            Profiler.closeThreadProfiler();
             out.println(objectMapper.writeValueAsString(apiResponse));
             if (out != null) {
                 out.close();
@@ -155,9 +154,9 @@ public class UserHandler extends HttpServlet {
         }
     }
 
+    @ThreadProfiler
     @Override
     protected void doDelete(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        Profiler.createThreadProfilerInHttpProc("UserHandler.deleteUser", req);
         resp.setHeader("Access-Control-Allow-Origin", "*");
         resp.setContentType("application/json");
         resp.setCharacterEncoding("UTF-8");
@@ -175,7 +174,6 @@ public class UserHandler extends HttpServlet {
             apiResponse.setCode(handleErrorCode(ex));
             apiResponse.setData(ex.getMessage());
         } finally {
-            Profiler.closeThreadProfiler();
             out.println(objectMapper.writeValueAsString(apiResponse));
             if (out != null) {
                 out.close();

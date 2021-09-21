@@ -5,6 +5,7 @@
 package com.vng.zing.managementuser.services;
 
 import com.google.inject.Inject;
+import com.vng.zing.dmp.common.interceptor.ApiProfiler;
 import com.vng.zing.logger.ZLogger;
 import com.vng.zing.managementuser.entity.ApiResponse;
 import com.vng.zing.managementuser.entity.UserDTO;
@@ -26,34 +27,33 @@ public class UserListService {
     public static final UserMwClient client = new UserMwClient("Main");
 
     private ApiResponse apiResponse;
-    
+
     @Inject
     public UserListService(ApiResponse apiResponse) {
         this.apiResponse = apiResponse;
     }
 
+    @ApiProfiler
     public List<UserDTO> getList() throws TException {
-        Profiler.getThreadProfiler().push(this.getClass(), "getListUser");
+
         List<UserDTO> arrayData = new ArrayList<UserDTO>();
-        try {
-            ListUserResult result = client.getUsers(new ListUserParams());
-            if (result.getCode() != 0) {
-                return Collections.EMPTY_LIST;
-            }
-            for (User user : result.getData()) {
-                UserDTO myUserDTO = new UserDTO();
-                myUserDTO.setId(user.id);
-                myUserDTO.setName(user.name);
-                myUserDTO.setUserName(user.username);
-                myUserDTO.setGender(user.gender);
-                myUserDTO.setBirthday(DateTimeUtils.getLocalDateTime(user.birthday));
-                myUserDTO.setUpdateTime(DateTimeUtils.getLocalDateTime(user.updatetime));
-                myUserDTO.setCreateTime(DateTimeUtils.getLocalDateTime(user.createtime));
-                arrayData.add(myUserDTO);
-            }
-        } finally {
-            Profiler.getThreadProfiler().pop(this.getClass(), "getListUser");
+
+        ListUserResult result = client.getUsers(new ListUserParams());
+        if (result.getCode() != 0) {
+            return Collections.EMPTY_LIST;
         }
+        for (User user : result.getData()) {
+            UserDTO myUserDTO = new UserDTO();
+            myUserDTO.setId(user.id);
+            myUserDTO.setName(user.name);
+            myUserDTO.setUserName(user.username);
+            myUserDTO.setGender(user.gender);
+            myUserDTO.setBirthday(DateTimeUtils.getLocalDateTime(user.birthday));
+            myUserDTO.setUpdateTime(DateTimeUtils.getLocalDateTime(user.updatetime));
+            myUserDTO.setCreateTime(DateTimeUtils.getLocalDateTime(user.createtime));
+            arrayData.add(myUserDTO);
+        }
+
         return arrayData;
     }
 }
