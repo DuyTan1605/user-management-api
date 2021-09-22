@@ -24,7 +24,6 @@ import com.vng.zing.userservice.thrift.UpdateUserResult;
 import com.vng.zing.userservice.thrift.User;
 import com.vng.zing.userservice.thrift.wrapper.UserMwClient;
 import com.vng.zing.managementuser.utils.DateTimeUtils;
-import com.vng.zing.stats.Profiler;
 import org.apache.thrift.TException;
 import org.json.JSONException;
 import org.json.simple.parser.ParseException;

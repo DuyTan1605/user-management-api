@@ -5,7 +5,6 @@
  */
 package com.vng.zing.managementuser.handlers;
 
-import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.google.inject.Inject;
 import com.vng.zing.common.HReqParam;
 import com.vng.zing.dmp.common.exception.ZInvalidParamException;
@@ -17,10 +16,8 @@ import com.vng.zing.managementuser.entity.ApiResponse;
 import com.vng.zing.managementuser.entity.UserDTO;
 import com.vng.zing.managementuser.services.UserService;
 import com.vng.zing.managementuser.utils.RequestUtils;
-import com.vng.zing.stats.Profiler;
 import com.vng.zing.userservice.thrift.User;
 import com.vng.zing.zcommon.thrift.ECode;
-import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PrintWriter;
 import javax.servlet.ServletException;

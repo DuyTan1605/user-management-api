@@ -4,15 +4,10 @@
  */
 package com.vng.zing.managementuser;
 
-import com.google.inject.Guice;
 import com.google.inject.Inject;
-import com.google.inject.Injector;
 import com.vng.zing.jettyserver.WebServers;
 import com.vng.zing.managementuser.handlers.UserHandler;
 import com.vng.zing.managementuser.handlers.UserListHandler;
-import com.vng.zing.managementuser.modules.ProfilerModule;
-import com.vng.zing.managementuser.services.UserListService;
-import com.vng.zing.managementuser.services.UserService;
 import org.eclipse.jetty.servlet.ServletHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
 

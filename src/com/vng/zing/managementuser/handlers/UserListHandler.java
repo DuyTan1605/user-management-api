@@ -4,9 +4,7 @@
  */
 package com.vng.zing.managementuser.handlers;
 
-import com.google.inject.Guice;
 import com.google.inject.Inject;
-import com.google.inject.Injector;
 import com.vng.zing.dmp.common.exception.ZInvalidParamException;
 import com.vng.zing.dmp.common.exception.ZNotExistException;
 import com.vng.zing.dmp.common.exception.ZRemoteFailureException;
@@ -15,8 +13,6 @@ import com.vng.zing.logger.ZLogger;
 import com.vng.zing.managementuser.entity.ApiResponse;
 import com.vng.zing.managementuser.entity.UserDTO;
 import com.vng.zing.managementuser.services.UserListService;
-import com.vng.zing.managementuser.services.ValidateService;
-import com.vng.zing.stats.Profiler;
 import com.vng.zing.zcommon.thrift.ECode;
 import java.io.IOException;
 import java.io.PrintWriter;

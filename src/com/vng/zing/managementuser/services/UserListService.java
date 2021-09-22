@@ -14,7 +14,6 @@ import com.vng.zing.userservice.thrift.ListUserResult;
 import com.vng.zing.userservice.thrift.User;
 import com.vng.zing.userservice.thrift.wrapper.UserMwClient;
 import com.vng.zing.managementuser.utils.DateTimeUtils;
-import com.vng.zing.stats.Profiler;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
