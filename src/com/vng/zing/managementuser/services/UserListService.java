@@ -7,7 +7,6 @@ package com.vng.zing.managementuser.services;
 import com.google.inject.Inject;
 import com.vng.zing.dmp.common.interceptor.ApiProfiler;
 import com.vng.zing.logger.ZLogger;
-import com.vng.zing.managementuser.entity.ApiResponse;
 import com.vng.zing.managementuser.entity.UserDTO;
 import com.vng.zing.userservice.thrift.ListUserParams;
 import com.vng.zing.userservice.thrift.ListUserResult;
@@ -23,13 +22,11 @@ import org.apache.thrift.TException;
 public class UserListService {
 
     private static final Logger logger = ZLogger.getLogger(UserListService.class);
-    public static final UserMwClient client = new UserMwClient("Main");
-
-    private ApiResponse apiResponse;
+    private UserMwClient client;
 
     @Inject
-    public UserListService(ApiResponse apiResponse) {
-        this.apiResponse = apiResponse;
+    public UserListService(UserMwClient client) {
+        this.client = client;
     }
 
     @ApiProfiler

@@ -5,7 +5,9 @@
  */
 package com.vng.zing.managementuser.services;
 
+import com.google.inject.Guice;
 import com.google.inject.Inject;
+import com.google.inject.Injector;
 import com.vng.zing.dmp.common.exception.ZInvalidParamException;
 import com.vng.zing.dmp.common.exception.ZUnknownException;
 import com.vng.zing.dmp.common.interceptor.ApiProfiler;
@@ -13,6 +15,7 @@ import com.vng.zing.exception.InvalidParamException;
 import com.vng.zing.exception.NotExistException;
 import com.vng.zing.managementuser.entity.ApiResponse;
 import com.vng.zing.managementuser.entity.UserDTO;
+import com.vng.zing.managementuser.modules.UserMwModule;
 import com.vng.zing.userservice.thrift.CreateUserParams;
 import com.vng.zing.userservice.thrift.CreateUserResult;
 import com.vng.zing.userservice.thrift.DeleteUserParams;
@@ -34,12 +37,13 @@ import org.json.simple.parser.ParseException;
  */
 public class UserService {
 
-    private UserMwClient client = new UserMwClient("Main");
+    private UserMwClient client;
     private ValidateService validateService;
 
     @Inject
-    public UserService(ValidateService validateService) {
+    public UserService(ValidateService validateService, UserMwClient client) {
         this.validateService = validateService;
+        this.client = client;
     }
 
     @ApiProfiler
